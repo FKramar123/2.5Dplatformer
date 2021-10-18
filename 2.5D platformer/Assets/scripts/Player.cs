@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Text WinnerText;
     [SerializeField] private Text LivesText;
     [SerializeField] private Text GameOverText;
+    [SerializeField] private Text YouDiedText;
     [SerializeField] private Transform Rewspawn;
     private bool jumpKeyWasPressed;
     private float horizontalInput;
@@ -31,6 +32,7 @@ public class Player : MonoBehaviour
         remainingLives = 3;
         SetLivesText();
         GameOverText.text = "";
+        YouDiedText.text = "";
 
     }
 
@@ -68,10 +70,7 @@ public class Player : MonoBehaviour
             SetScoreText();
 
         }
-        if (other.gameObject.layer == 8) { 
-            remainingLives--;
-            SetLivesText();
-        }
+        
             
     }
     private void OnCollisionEnter(Collision collision)
@@ -80,16 +79,23 @@ public class Player : MonoBehaviour
         if (collision.gameObject.layer == 8 || collision.gameObject.layer == 9)
         {
             transform.position = Rewspawn.position;
+
+
             if (remainingLives > 0)
-                remainingLives--;
-            else remainingLives = 0;
+                remainingLives--;           
+            else
+                remainingLives = 0;
             SetLivesText();
         }
+    }
+    void DisableText()
+    {
+        YouDiedText.enabled = false;
     }
     private void SetScoreText()
     {
         ScoreText.text = ("Score: " + score.ToString());
-        if(score>=5 && remainingLives>0)
+        if(score>=6 && remainingLives>0)
         {
             WinnerText.text = "Winner Winner Chicken Dinner";
             
@@ -100,12 +106,21 @@ public class Player : MonoBehaviour
     private void SetLivesText()
     {
         LivesText.text = ("Lives: " + remainingLives.ToString());
-        if (remainingLives==0)
-        {    if (score >= 5)
-                return;
+        if (score >= 5)
+            return;
+        else
+        {
+            if (remainingLives > 0)
+            {
+                YouDiedText.text = "You died!";
+                Invoke("DisableText", 1f);
+                YouDiedText.enabled = true;
+            }
             else
             {
-                GameOverText.text = "You died!!";
+
+                GameOverText.text = "GameOver";
+
             }
         }
     }
